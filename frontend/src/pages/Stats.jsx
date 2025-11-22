@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowLeft,
+  RefreshCw,
+  BarChart3,
+  Link2,
+  ExternalLink,
+  TrendingUp,
+  Clock,
+  Calendar,
+  Eye,
+  Zap,
+  Copy,
+  CheckCircle2,
+} from "lucide-react";
 import { linksAPI } from "../utils/api";
 
 const Stats = () => {
@@ -9,6 +23,7 @@ const Stats = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshCount, setRefreshCount] = useState(0);
+  const [copied, setCopied] = useState({ shortUrl: false, originalUrl: false });
 
   const fetchLinkStats = async () => {
     try {
@@ -33,10 +48,23 @@ const Stats = () => {
     setRefreshCount((prev) => prev + 1);
   };
 
+  const handleCopy = (text, type) => {
+    navigator.clipboard.writeText(text);
+    setCopied((prev) => ({ ...prev, [type]: true }));
+    setTimeout(() => setCopied((prev) => ({ ...prev, [type]: false })), 2000);
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return "Never";
     try {
-      return new Date(dateString).toLocaleString();
+      return new Date(dateString).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     } catch (error) {
       return "Invalid Date";
     }
@@ -73,15 +101,16 @@ const Stats = () => {
 
   // Animation variants
   const pageVariants = {
-    initial: { opacity: 0, y: 20 },
-    in: { opacity: 1, y: 0 },
-    out: { opacity: 0, y: -20 },
+    initial: { opacity: 0, y: 30, scale: 0.98 },
+    in: { opacity: 1, y: 0, scale: 1 },
+    out: { opacity: 0, y: -30, scale: 1.02 },
   };
 
   const pageTransition = {
-    type: "tween",
-    ease: "anticipate",
-    duration: 0.5,
+    type: "spring",
+    stiffness: 100,
+    damping: 20,
+    duration: 0.7,
   };
 
   const containerVariants = {
@@ -89,31 +118,34 @@ const Stats = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
+        staggerChildren: 0.15,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30, scale: 0.9 },
     visible: {
       opacity: 1,
       y: 0,
+      scale: 1,
       transition: {
         type: "spring",
         stiffness: 100,
+        damping: 15,
       },
     },
   };
 
   const statCardVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
+    hidden: { opacity: 0, scale: 0.8, y: 20 },
     visible: {
       opacity: 1,
       scale: 1,
+      y: 0,
       transition: {
         type: "spring",
-        stiffness: 300,
+        stiffness: 200,
         damping: 20,
       },
     },
@@ -137,17 +169,25 @@ const Stats = () => {
           transition={{ duration: 0.5 }}
         >
           <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
-          ></motion.div>
+            animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"
+          />
           <motion.p
-            className="mt-4 text-gray-600"
+            className="text-gray-600 text-lg font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            Loading link statistics...
+            Loading analytics...
+          </motion.p>
+          <motion.p
+            className="text-gray-400 text-sm mt-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            Gathering your link statistics
           </motion.p>
         </motion.div>
       </div>
@@ -165,25 +205,17 @@ const Stats = () => {
           variants={pageVariants}
           transition={pageTransition}
         >
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <motion.svg
-              className="h-12 w-12 text-red-400 mx-auto mb-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+          <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-2xl p-8">
+            <motion.div
+              className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-2xl flex items-center justify-center"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </motion.svg>
+              <BarChart3 className="w-8 h-8 text-red-600" />
+            </motion.div>
             <motion.h3
-              className="text-lg font-medium text-red-800 mb-2"
+              className="text-xl font-bold text-red-800 mb-3"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -191,7 +223,7 @@ const Stats = () => {
               Link Not Found
             </motion.h3>
             <motion.p
-              className="text-red-700 mb-4"
+              className="text-red-700 mb-6"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -207,8 +239,9 @@ const Stats = () => {
             >
               <Link
                 to="/"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
+                <ArrowLeft className="w-4 h-4" />
                 Back to Dashboard
               </Link>
             </motion.div>
@@ -239,7 +272,7 @@ const Stats = () => {
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               to="/"
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className="text-blue-600 hover:text-blue-800 font-medium text-lg"
             >
               Return to Dashboard
             </Link>
@@ -251,9 +284,75 @@ const Stats = () => {
 
   const shortUrl = `${window.location.origin}/${link.shortCode}`;
 
+  const stats = [
+    {
+      value: link.totalClicks || 0,
+      label: "Total Clicks",
+      icon: TrendingUp,
+      color: "blue",
+      description: "All-time engagement",
+      valueSize: "text-3xl sm:text-4xl",
+    },
+    {
+      value: link.shortCode,
+      label: "Short Code",
+      icon: Link2,
+      color: "teal",
+      description: "Your unique identifier",
+      valueSize: "text-xl sm:text-2xl",
+    },
+    {
+      value: link.lastClicked
+        ? formatDate(link.lastClicked).split(",")[0]
+        : "Never",
+      label: "Last Clicked",
+      icon: Clock,
+      color: "purple",
+      description: link.lastClicked
+        ? getTimeSinceLastClick()
+        : "No activity yet",
+      valueSize: "text-lg sm:text-xl",
+    },
+    {
+      value: getTimeSinceCreation(),
+      label: "Active For",
+      icon: Calendar,
+      color: "orange",
+      description: `Created ${new Date(link.createdAt).toLocaleDateString()}`,
+      valueSize: "text-lg sm:text-xl",
+    },
+  ];
+
+  const colorMap = {
+    blue: {
+      bg: "from-blue-50 to-blue-100",
+      border: "border-blue-200",
+      text: "text-blue-900",
+      icon: "text-blue-600",
+    },
+    teal: {
+      bg: "from-teal-50 to-teal-100",
+      border: "border-teal-200",
+      text: "text-teal-900",
+      icon: "text-teal-600",
+    },
+    purple: {
+      bg: "from-purple-50 to-purple-100",
+      border: "border-purple-200",
+      text: "text-purple-900",
+      icon: "text-purple-600",
+    },
+    orange: {
+      bg: "from-orange-50 to-orange-100",
+      border: "border-orange-200",
+      text: "text-orange-900",
+      icon: "text-orange-600",
+    },
+  };
+
   return (
     <motion.div
-      className="max-w-6xl mx-auto p-4 sm:p-6"
+      className="max-w-7xl mx-auto p-4 sm:p-6"
       initial="initial"
       animate="in"
       exit="out"
@@ -261,35 +360,44 @@ const Stats = () => {
       transition={pageTransition}
     >
       <motion.div
-        className="bg-white rounded-lg shadow-md p-4 sm:p-6"
+        className="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl border border-blue-100 p-6 sm:p-8"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Header */}
+        {/* Enhanced Header */}
         <motion.div
-          className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0"
+          className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6"
           variants={itemVariants}
         >
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-              Link Analytics
-            </h1>
-            <p className="text-gray-600 mt-1 text-sm sm:text-base">
-              Detailed statistics for your short link
-            </p>
+          <div className="flex items-center gap-4">
+            <motion.div
+              className="p-3 bg-gradient-to-br from-blue-600 to-teal-600 rounded-2xl shadow-lg"
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 400 }}
+            >
+              <BarChart3 className="w-8 h-8 text-white" />
+            </motion.div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
+                Link Analytics
+              </h1>
+              <p className="text-gray-600 mt-2 text-lg">
+                Detailed performance insights for your short link
+              </p>
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <motion.button
               onClick={handleRefresh}
               disabled={loading}
               variants={itemVariants}
-              whileHover={!loading ? { scale: 1.05 } : {}}
+              whileHover={!loading ? { scale: 1.05, y: -2 } : {}}
               whileTap={!loading ? { scale: 0.95 } : {}}
-              className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors order-2 sm:order-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 text-base font-semibold text-blue-700 bg-blue-50 rounded-xl hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 border-2 border-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
             >
               {loading ? (
-                <span className="flex items-center justify-center">
+                <>
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{
@@ -297,189 +405,195 @@ const Stats = () => {
                       repeat: Infinity,
                       ease: "linear",
                     }}
-                    className="w-4 h-4 border border-blue-600 border-t-transparent rounded-full mr-2"
+                    className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full"
                   />
                   Refreshing...
-                </span>
+                </>
               ) : (
-                "Refresh Stats"
+                <>
+                  <RefreshCw className="w-5 h-5" />
+                  Refresh Stats
+                </>
               )}
             </motion.button>
             <motion.div
               variants={itemVariants}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="order-1 sm:order-2"
+              className="flex-1 sm:flex-none"
             >
               <Link
                 to="/"
-                className="inline-flex justify-center items-center px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors w-full sm:w-auto"
+                className="inline-flex justify-center items-center gap-3 px-6 py-3 text-base font-semibold text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 border-2 border-gray-200 w-full sm:w-auto"
               >
-                ← Dashboard
+                <ArrowLeft className="w-5 h-5" />
+                Dashboard
               </Link>
             </motion.div>
           </div>
         </motion.div>
 
-        {/* Short URL Card */}
+        {/* Enhanced Short URL Card */}
         <motion.div
-          className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6"
+          className="bg-gradient-to-r from-blue-50 to-teal-50 rounded-2xl p-6 mb-8 border-2 border-blue-200 shadow-sm"
           variants={itemVariants}
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.02, y: -2 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-medium text-blue-800">Short URL</h3>
-              <p className="text-base sm:text-lg font-semibold text-blue-900 break-words">
+              <div className="flex items-center gap-3 mb-4">
+                <Link2 className="w-6 h-6 text-blue-600" />
+                <h3 className="text-xl font-semibold text-blue-800">
+                  Short URL
+                </h3>
+              </div>
+              <p className="text-2xl font-bold text-blue-900 break-words bg-white/80 p-4 rounded-xl border-2 border-blue-200">
                 {shortUrl}
               </p>
             </div>
             <motion.button
-              onClick={() => navigator.clipboard.writeText(shortUrl)}
+              onClick={() => handleCopy(shortUrl, "shortUrl")}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-3 py-1 text-sm font-medium text-blue-600 bg-white border border-blue-300 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors whitespace-nowrap"
+              className="px-6 py-3 text-base font-semibold bg-white text-blue-600 rounded-xl hover:bg-blue-50 transition-all duration-200 border-2 border-blue-200 flex items-center gap-3 min-w-[140px] justify-center"
             >
-              Copy URL
+              {copied.shortUrl ? (
+                <>
+                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-5 h-5" />
+                  Copy URL
+                </>
+              )}
             </motion.button>
           </div>
         </motion.div>
 
-        {/* Stats Grid */}
+        {/* Enhanced Stats Grid */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
           variants={containerVariants}
         >
-          {[
-            {
-              value: link.totalClicks || 0,
-              label: "Total Clicks",
-              gradient: "from-blue-50 to-blue-100",
-              border: "border-blue-200",
-              text: "text-blue-900",
-              subText: "text-blue-700",
-              description: link.totalClicks > 0 ? "Tracked in real-time" : null,
-              valueSize: "text-2xl sm:text-3xl",
-            },
-            {
-              value: link.shortCode,
-              label: "Short Code",
-              gradient: "from-green-50 to-green-100",
-              border: "border-green-200",
-              text: "text-green-900",
-              subText: "text-green-700",
-              valueSize: "text-lg sm:text-xl",
-            },
-            {
-              value: link.lastClicked
-                ? formatDate(link.lastClicked).split(",")[0]
-                : "Never",
-              label: "Last Clicked",
-              gradient: "from-purple-50 to-purple-100",
-              border: "border-purple-200",
-              text: "text-purple-900",
-              subText: "text-purple-700",
-              description: link.lastClicked ? getTimeSinceLastClick() : null,
-              valueSize: "text-sm sm:text-base",
-            },
-            {
-              value: getTimeSinceCreation(),
-              label: "Active For",
-              gradient: "from-orange-50 to-orange-100",
-              border: "border-orange-200",
-              text: "text-orange-900",
-              subText: "text-orange-700",
-              description: `Since ${
-                link.createdAt
-                  ? formatDate(link.createdAt).split(",")[0]
-                  : "N/A"
-              }`,
-              valueSize: "text-sm sm:text-base",
-            },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              className={`bg-gradient-to-br ${stat.gradient} rounded-lg p-4 text-center border ${stat.border}`}
-              variants={statCardVariants}
-              whileHover="hover"
-            >
-              <div className={`font-bold ${stat.text} ${stat.valueSize} mb-2`}>
-                {stat.value}
-              </div>
-              <div className={`text-sm font-medium ${stat.subText} mb-1`}>
-                {stat.label}
-              </div>
-              {stat.description && (
-                <motion.div
-                  className={`text-xs ${stat.subText} mt-2`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: index * 0.1 + 0.5 }}
-                >
-                  {stat.description}
-                </motion.div>
-              )}
-            </motion.div>
-          ))}
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            const colors = colorMap[stat.color];
+
+            return (
+              <motion.div
+                key={index}
+                className={`bg-gradient-to-br ${colors.bg} rounded-2xl p-6 text-center border-2 ${colors.border} shadow-sm relative overflow-hidden`}
+                variants={statCardVariants}
+                whileHover="hover"
+              >
+                {/* Background Icon */}
+                <div className="absolute top-2 right-2 opacity-10">
+                  <Icon className="w-12 h-12" />
+                </div>
+
+                <div className="relative z-10">
+                  <div
+                    className={`p-3 rounded-xl bg-white/50 inline-flex mb-4 border-2 ${colors.border}`}
+                  >
+                    <Icon className={`w-6 h-6 ${colors.icon}`} />
+                  </div>
+                  <div
+                    className={`font-bold ${colors.text} ${stat.valueSize} mb-3`}
+                  >
+                    {stat.value}
+                  </div>
+                  <div className={`text-lg font-semibold ${colors.text} mb-2`}>
+                    {stat.label}
+                  </div>
+                  <motion.div
+                    className={`text-sm ${colors.text}/70`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: index * 0.2 + 0.5 }}
+                  >
+                    {stat.description}
+                  </motion.div>
+                </div>
+              </motion.div>
+            );
+          })}
         </motion.div>
 
-        {/* Destination URL */}
+        {/* Enhanced Destination URL */}
         <motion.div
-          className="border border-gray-200 rounded-lg p-4 mb-6"
+          className="border-2 border-gray-200 rounded-2xl p-6 mb-8 bg-white shadow-sm"
           variants={itemVariants}
-          whileHover={{ scale: 1.01 }}
+          whileHover={{ scale: 1.01, y: -1 }}
         >
-          <h3 className="text-sm font-medium text-gray-700 mb-2">
-            Destination URL
-          </h3>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+          <div className="flex items-center gap-3 mb-4">
+            <ExternalLink className="w-6 h-6 text-gray-600" />
+            <h3 className="text-xl font-semibold text-gray-800">
+              Destination URL
+            </h3>
+          </div>
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <p
-              className="text-gray-900 break-words flex-1 mr-0 sm:mr-4 text-sm sm:text-base"
+              className="text-gray-900 break-words flex-1 text-lg bg-gray-50 p-4 rounded-xl border-2 border-gray-200 font-medium"
               title={link.originalUrl}
             >
               {link.originalUrl}
             </p>
             <motion.button
-              onClick={() => navigator.clipboard.writeText(link.originalUrl)}
+              onClick={() => handleCopy(link.originalUrl, "originalUrl")}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-3 py-1 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors whitespace-nowrap"
+              className="px-6 py-3 text-base font-semibold bg-white text-gray-600 rounded-xl hover:bg-gray-50 transition-all duration-200 border-2 border-gray-200 flex items-center gap-3 min-w-[140px] justify-center"
             >
-              Copy URL
+              {copied.originalUrl ? (
+                <>
+                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-5 h-5" />
+                  Copy URL
+                </>
+              )}
             </motion.button>
           </div>
         </motion.div>
 
-        {/* Additional Information */}
+        {/* Enhanced Additional Information */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 text-sm mb-6"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-base mb-8"
           variants={containerVariants}
         >
           <motion.div
-            className="bg-gray-50 rounded-lg p-4"
+            className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-6 border-2 border-gray-200 shadow-sm"
             variants={itemVariants}
-            whileHover={{ y: -2 }}
+            whileHover={{ y: -2, scale: 1.01 }}
           >
-            <h4 className="font-medium text-gray-700 mb-3">
-              Creation Information
-            </h4>
-            <div className="space-y-2 text-gray-600">
-              <div className="flex justify-between items-center">
-                <span className="text-xs sm:text-sm">Created:</span>
-                <span className="font-medium text-xs sm:text-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <Calendar className="w-5 h-5 text-blue-600" />
+              <h4 className="font-semibold text-gray-800 text-lg">
+                Creation Information
+              </h4>
+            </div>
+            <div className="space-y-4 text-gray-700">
+              <div className="flex justify-between items-center py-3 border-b border-gray-200/60">
+                <span className="font-medium">Created:</span>
+                <span className="font-semibold text-blue-700">
                   {formatDate(link.createdAt)}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs sm:text-sm">Last Updated:</span>
-                <span className="font-medium text-xs sm:text-sm">
+              <div className="flex justify-between items-center py-3 border-b border-gray-200/60">
+                <span className="font-medium">Last Updated:</span>
+                <span className="font-semibold text-teal-700">
                   {formatDate(link.updatedAt)}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs sm:text-sm">Link ID:</span>
-                <span className="font-medium text-xs truncate max-w-[120px] sm:max-w-[150px]">
+              <div className="flex justify-between items-center py-3">
+                <span className="font-medium">Link ID:</span>
+                <span className="font-mono text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-lg border">
                   {link.id}
                 </span>
               </div>
@@ -487,31 +601,48 @@ const Stats = () => {
           </motion.div>
 
           <motion.div
-            className="bg-gray-50 rounded-lg p-4"
+            className="bg-gradient-to-br from-gray-50 to-teal-50 rounded-2xl p-6 border-2 border-gray-200 shadow-sm"
             variants={itemVariants}
-            whileHover={{ y: -2 }}
+            whileHover={{ y: -2, scale: 1.01 }}
+            transition={{ delay: 0.1 }}
           >
-            <h4 className="font-medium text-gray-700 mb-3">Performance</h4>
-            <div className="space-y-2 text-gray-600">
-              <div className="flex justify-between items-center">
-                <span className="text-xs sm:text-sm">Click Through Rate:</span>
-                <span className="font-medium text-xs sm:text-sm">
-                  {link.totalClicks > 0 ? "Active" : "No clicks yet"}
+            <div className="flex items-center gap-3 mb-4">
+              <Zap className="w-5 h-5 text-teal-600" />
+              <h4 className="font-semibold text-gray-800 text-lg">
+                Performance
+              </h4>
+            </div>
+            <div className="space-y-4 text-gray-700">
+              <div className="flex justify-between items-center py-3 border-b border-gray-200/60">
+                <span className="font-medium">Click Through Rate:</span>
+                <span
+                  className={`font-semibold ${
+                    link.totalClicks > 0 ? "text-green-600" : "text-gray-600"
+                  }`}
+                >
+                  {link.totalClicks > 0 ? (
+                    <span className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Active
+                    </span>
+                  ) : (
+                    "No clicks yet"
+                  )}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs sm:text-sm">Status:</span>
+              <div className="flex justify-between items-center py-3 border-b border-gray-200/60">
+                <span className="font-medium">Status:</span>
                 <span
-                  className={`font-medium text-xs sm:text-sm ${
-                    link.totalClicks > 0 ? "text-green-600" : "text-gray-600"
+                  className={`font-semibold ${
+                    link.totalClicks > 0 ? "text-green-600" : "text-blue-600"
                   }`}
                 >
                   {link.totalClicks > 0 ? "Performing" : "Ready"}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs sm:text-sm">Last Activity:</span>
-                <span className="font-medium text-xs sm:text-sm">
+              <div className="flex justify-between items-center py-3">
+                <span className="font-medium">Last Activity:</span>
+                <span className="font-semibold text-purple-700">
                   {getTimeSinceLastClick()}
                 </span>
               </div>
@@ -519,16 +650,21 @@ const Stats = () => {
           </motion.div>
         </motion.div>
 
-        {/* Click Activity */}
-        <motion.div className="mt-6 sm:mt-8" variants={itemVariants}>
-          <h4 className="font-medium text-gray-700 mb-3">Click Activity</h4>
+        {/* Enhanced Click Activity */}
+        <motion.div className="mt-8" variants={itemVariants}>
+          <div className="flex items-center gap-3 mb-6">
+            <Eye className="w-6 h-6 text-gray-600" />
+            <h4 className="font-semibold text-gray-800 text-xl">
+              Click Activity
+            </h4>
+          </div>
           <motion.div
-            className={`rounded-lg p-4 sm:p-6 text-center ${
+            className={`rounded-2xl p-8 text-center border-2 shadow-sm ${
               link.totalClicks > 0
-                ? "bg-green-50 border border-green-200"
-                : "bg-gray-50 border border-gray-200"
+                ? "bg-gradient-to-br from-green-50 to-teal-50 border-green-200"
+                : "bg-gradient-to-br from-gray-50 to-blue-50 border-gray-200"
             }`}
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02, y: -2 }}
             transition={{ type: "spring", stiffness: 200 }}
           >
             <AnimatePresence mode="wait">
@@ -538,40 +674,41 @@ const Stats = () => {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <motion.svg
-                    className="h-8 sm:h-12 w-8 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <motion.div
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                    className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </motion.svg>
-                  <motion.p
-                    className="text-gray-600 mb-2 text-sm sm:text-base"
+                    <Eye className="w-10 h-10 text-gray-400" />
+                  </motion.div>
+                  <motion.h3
+                    className="text-2xl font-bold text-gray-700 mb-4"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                   >
-                    No clicks yet. Share your short link to start tracking!
-                  </motion.p>
+                    No Clicks Yet
+                  </motion.h3>
                   <motion.p
-                    className="text-xs sm:text-sm text-gray-500"
+                    className="text-gray-600 mb-6 text-lg"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
                   >
-                    The click counter will update automatically when someone
-                    uses your link.
+                    Share your short link to start tracking engagement!
+                  </motion.p>
+                  <motion.p
+                    className="text-sm text-gray-500 max-w-md mx-auto"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    The click counter updates automatically. Share your link on
+                    social media, emails, or anywhere you'd normally share a
+                    URL.
                   </motion.p>
                 </motion.div>
               ) : (
@@ -580,33 +717,24 @@ const Stats = () => {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <motion.svg
-                    className="h-8 sm:h-12 w-8 sm:w-12 text-green-400 mx-auto mb-3 sm:mb-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                    className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-green-200 to-teal-300 rounded-3xl flex items-center justify-center"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </motion.svg>
-                  <motion.p
-                    className="text-gray-700 mb-2 text-sm sm:text-base"
+                    <TrendingUp className="w-10 h-10 text-green-600" />
+                  </motion.div>
+                  <motion.h3
+                    className="text-3xl font-bold text-gray-800 mb-4"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                   >
-                    This link has been clicked{" "}
                     <motion.span
-                      className="font-bold text-green-600"
+                      className="text-green-600"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{
@@ -617,14 +745,22 @@ const Stats = () => {
                     >
                       {link.totalClicks}
                     </motion.span>{" "}
-                    time{link.totalClicks === 1 ? "" : "s"}.
+                    Click{link.totalClicks === 1 ? "" : "s"} Tracked!
+                  </motion.h3>
+                  <motion.p
+                    className="text-gray-700 text-xl mb-6"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    Your link is performing well and engaging users effectively.
                   </motion.p>
                   {link.lastClicked && (
                     <motion.p
-                      className="text-xs sm:text-sm text-gray-600"
+                      className="text-base text-gray-600 bg-white/80 p-4 rounded-xl border border-green-200 inline-block"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
+                      transition={{ delay: 0.6 }}
                     >
                       Last clicked on {formatDate(link.lastClicked)}
                     </motion.p>

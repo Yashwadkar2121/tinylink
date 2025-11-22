@@ -14,25 +14,44 @@ function App() {
     initial: {
       opacity: 0,
       y: 20,
+      scale: 0.98,
     },
     in: {
       opacity: 1,
       y: 0,
+      scale: 1,
     },
     out: {
       opacity: 0,
       y: -20,
+      scale: 1.02,
     },
   };
 
   const pageTransition = {
-    type: "tween",
-    ease: "anticipate",
+    type: "spring",
+    stiffness: 100,
+    damping: 20,
     duration: 0.4,
   };
 
+  const backgroundVariants = {
+    initial: {
+      background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+    },
+    in: {
+      background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <motion.div
+      className="min-h-screen flex flex-col"
+      variants={backgroundVariants}
+      initial="initial"
+      animate="in"
+      transition={{ duration: 1 }}
+    >
       <Header />
       <main className="flex-grow container mx-auto px-4 py-6 sm:py-8">
         <AnimatePresence mode="wait">
@@ -83,7 +102,7 @@ function App() {
         </AnimatePresence>
       </main>
       <Footer />
-    </div>
+    </motion.div>
   );
 }
 

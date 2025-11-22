@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link2, Zap, AlertCircle, CheckCircle2 } from "lucide-react";
 
 const CreateLinkForm = ({ onSubmit, loading }) => {
   const [formData, setFormData] = useState({
@@ -68,19 +69,29 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white p-4 sm:p-6 rounded-lg shadow-md"
+      transition={{ duration: 0.6, type: "spring" }}
+      className="bg-gradient-to-br from-white to-blue-50 p-6 rounded-2xl shadow-lg border border-blue-100"
     >
-      <motion.h2
-        className="text-xl font-semibold mb-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+      <motion.div
+        className="flex items-center gap-3 mb-6"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1 }}
       >
-        Create Short Link
-      </motion.h2>
+        <div className="p-2 bg-blue-100 rounded-lg">
+          <Link2 className="w-6 h-6 text-blue-600" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Create Short Link
+          </h2>
+          <p className="text-gray-600 text-sm">
+            Transform long URLs into short, shareable links
+          </p>
+        </div>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -88,30 +99,45 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
         >
           <label
             htmlFor="originalUrl"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
           >
+            <Zap className="w-4 h-4 text-blue-500" />
             Destination URL *
           </label>
-          <input
-            type="url"
-            id="originalUrl"
-            name="originalUrl"
-            value={formData.originalUrl}
-            onChange={handleChange}
-            placeholder="https://example.com"
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base ${
-              errors.originalUrl ? "border-red-300" : "border-gray-300"
-            }`}
-            disabled={loading}
-          />
+          <div className="relative">
+            <input
+              type="url"
+              id="originalUrl"
+              name="originalUrl"
+              value={formData.originalUrl}
+              onChange={handleChange}
+              placeholder="https://example.com/very-long-url-path"
+              className={`w-full px-4 py-3 border-2 rounded-xl shadow-sm focus:outline-none transition-all duration-200 text-sm sm:text-base ${
+                errors.originalUrl
+                  ? "border-red-300 focus:border-red-500 bg-red-50"
+                  : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={loading}
+            />
+            {formData.originalUrl && !errors.originalUrl && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+              >
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+              </motion.div>
+            )}
+          </div>
           <AnimatePresence>
             {errors.originalUrl && (
               <motion.p
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-1 text-sm text-red-600"
+                className="mt-2 text-sm text-red-600 flex items-center gap-2"
               >
+                <AlertCircle className="w-4 h-4" />
                 {errors.originalUrl}
               </motion.p>
             )}
@@ -125,7 +151,7 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
         >
           <label
             htmlFor="shortCode"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-semibold text-gray-700 mb-2"
           >
             Custom Short Code (optional)
           </label>
@@ -135,10 +161,12 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
             name="shortCode"
             value={formData.shortCode}
             onChange={handleChange}
-            placeholder="my-link"
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base ${
-              errors.shortCode ? "border-red-300" : "border-gray-300"
-            }`}
+            placeholder="my-custom-link"
+            className={`w-full px-4 py-3 border-2 rounded-xl shadow-sm focus:outline-none transition-all duration-200 text-sm sm:text-base ${
+              errors.shortCode
+                ? "border-red-300 focus:border-red-500 bg-red-50"
+                : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             disabled={loading}
           />
           <AnimatePresence>
@@ -147,14 +175,15 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-1 text-sm text-red-600"
+                className="mt-2 text-sm text-red-600 flex items-center gap-2"
               >
+                <AlertCircle className="w-4 h-4" />
                 {errors.shortCode}
               </motion.p>
             )}
           </AnimatePresence>
-          <p className="mt-1 text-xs text-gray-500">
-            Leave empty for auto-generated code. 1-8 characters: letters,
+          <p className="mt-2 text-xs text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-200">
+            💡 Leave empty for auto-generated code. 1-8 characters: letters,
             numbers, hyphens, underscores.
           </p>
         </motion.div>
@@ -162,18 +191,32 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
         <motion.button
           type="submit"
           disabled={loading}
-          whileHover={!loading ? { scale: 1.02 } : {}}
+          whileHover={!loading ? { scale: 1.02, y: -2 } : {}}
           whileTap={!loading ? { scale: 0.98 } : {}}
-          className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+          className={`w-full py-4 px-6 border-2 border-transparent rounded-xl shadow-lg text-sm font-semibold text-white transition-all duration-200 flex items-center justify-center gap-3 ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              : "bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 focus:outline-none focus:ring-4 focus:ring-blue-200 hover:shadow-xl"
           }`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          {loading ? "Creating..." : "Create Short Link"}
+          {loading ? (
+            <>
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+              />
+              Creating Magic Link...
+            </>
+          ) : (
+            <>
+              <Zap className="w-5 h-5" />
+              Create Short Link
+            </>
+          )}
         </motion.button>
       </form>
     </motion.div>
