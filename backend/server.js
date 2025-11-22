@@ -13,22 +13,24 @@ const { errorHandler } = require("./middleware/errorHandler.js");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Allowed frontend origin
+// Simple CORS configuration that works for both development and production
 const allowedOrigins = [
-  "https://tinylink-lyart.vercel.app", // Production frontend
-  "http://localhost:5173", // Development
+  "https://tinylink-ctecrxnlw-yashs-projects-00930977.vercel.app",
+  "https://tinylink-lyart.vercel.app",
+  "http://localhost:5173",
+  "https://tinylink-frontend.vercel.app",
 ];
 
-// Middleware
-app.use(helmet());
 app.use(
   cors({
     origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
 
+app.use(helmet());
 app.use(express.json({ limit: "10mb" }));
 
 // Rate limiting
@@ -43,6 +45,14 @@ app.use(limiter);
 app.use("/api/links", linkRoutes);
 app.use("/api/healthz", healthRoutes);
 app.use("/", redirectRoutes);
+
+// Simple health check
+app.get("/", (req, res) => {
+  res.json({
+    message: "TinyLink API is running!",
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // Error handler
 app.use(errorHandler);
