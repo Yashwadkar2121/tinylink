@@ -13,9 +13,6 @@ const Link = sequelize.define(
       type: DataTypes.STRING(8),
       allowNull: false,
       unique: true,
-      // validate: {
-      //   is: /^[A-Za-z0-9_-]{1,8}$/,
-      // },
     },
     originalUrl: {
       type: DataTypes.TEXT,

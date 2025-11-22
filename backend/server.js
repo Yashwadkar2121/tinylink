@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-require("dotenv").config({ override: true });
+require("dotenv").config({ quiet: true });
 
 const sequelize = require("./config/database.js");
 const linkRoutes = require("./routes/links.js");
@@ -11,7 +11,7 @@ const healthRoutes = require("./routes/health.js");
 const { errorHandler } = require("./middleware/errorHandler.js");
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
 // Allowed frontend origin
 const allowedOrigins = [

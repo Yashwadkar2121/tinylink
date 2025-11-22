@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -32,6 +32,19 @@ export const linksAPI = {
   // Delete a link
   deleteLink: async (code) => {
     await api.delete(`/links/${code}`);
+  },
+
+  // 🆕 Hit redirect endpoint to trigger click count
+  trackClick: async (shortCode) => {
+    try {
+      await axios.get(
+        `${
+          import.meta.env.VITE_SERVER_REDIRECT_URL || "http://localhost:5000"
+        }/${shortCode}`
+      );
+    } catch (err) {
+      console.warn("Redirect tracking failed:", err.message);
+    }
   },
 
   // Health check

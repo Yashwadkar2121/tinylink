@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CreateLinkForm = ({ onSubmit, loading }) => {
   const [formData, setFormData] = useState({
@@ -13,7 +14,6 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -26,7 +26,6 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
     e.preventDefault();
     const newErrors = {};
 
-    // Validate URL
     if (!formData.originalUrl) {
       newErrors.originalUrl = "URL is required";
     } else if (!isValidUrl(formData.originalUrl)) {
@@ -34,7 +33,6 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
         "Please enter a valid URL (include http:// or https://)";
     }
 
-    // Validate short code if provided
     if (
       formData.shortCode &&
       !/^[A-Za-z0-9_-]{1,8}$/.test(formData.shortCode)
@@ -67,10 +65,27 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Create Short Link</h2>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white p-4 sm:p-6 rounded-lg shadow-md"
+    >
+      <motion.h2
+        className="text-xl font-semibold mb-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+      >
+        Create Short Link
+      </motion.h2>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
           <label
             htmlFor="originalUrl"
             className="block text-sm font-medium text-gray-700 mb-1"
@@ -84,17 +99,30 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
             value={formData.originalUrl}
             onChange={handleChange}
             placeholder="https://example.com"
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base ${
               errors.originalUrl ? "border-red-300" : "border-gray-300"
             }`}
             disabled={loading}
           />
-          {errors.originalUrl && (
-            <p className="mt-1 text-sm text-red-600">{errors.originalUrl}</p>
-          )}
-        </div>
+          <AnimatePresence>
+            {errors.originalUrl && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-1 text-sm text-red-600"
+              >
+                {errors.originalUrl}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
-        <div>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
           <label
             htmlFor="shortCode"
             className="block text-sm font-medium text-gray-700 mb-1"
@@ -108,33 +136,47 @@ const CreateLinkForm = ({ onSubmit, loading }) => {
             value={formData.shortCode}
             onChange={handleChange}
             placeholder="my-link"
-            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base ${
               errors.shortCode ? "border-red-300" : "border-gray-300"
             }`}
             disabled={loading}
           />
-          {errors.shortCode && (
-            <p className="mt-1 text-sm text-red-600">{errors.shortCode}</p>
-          )}
+          <AnimatePresence>
+            {errors.shortCode && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-1 text-sm text-red-600"
+              >
+                {errors.shortCode}
+              </motion.p>
+            )}
+          </AnimatePresence>
           <p className="mt-1 text-xs text-gray-500">
             Leave empty for auto-generated code. 1-8 characters: letters,
             numbers, hyphens, underscores.
           </p>
-        </div>
+        </motion.div>
 
-        <button
+        <motion.button
           type="submit"
           disabled={loading}
+          whileHover={!loading ? { scale: 1.02 } : {}}
+          whileTap={!loading ? { scale: 0.98 } : {}}
           className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           }`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
         >
           {loading ? "Creating..." : "Create Short Link"}
-        </button>
+        </motion.button>
       </form>
-    </div>
+    </motion.div>
   );
 };
 
