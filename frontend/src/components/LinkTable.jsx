@@ -104,7 +104,8 @@ const LinkTable = ({ links, loading, onDelete }) => {
     if (window.location.hostname === "localhost") {
       return `http://localhost:5000/${shortCode}`;
     }
-    return `${window.location.origin}/${shortCode}`;
+
+    return `https://tinylink-9nqm.vercel.app/${shortCode}`;
   };
 
   const handleShortLinkClick = (shortCode, event) => {

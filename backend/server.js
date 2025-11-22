@@ -15,8 +15,8 @@ const PORT = process.env.PORT || 5000;
 
 // Allowed frontend origin
 const allowedOrigins = [
-  "https://tinylink-j8zz9aeog-yashs-projects-00930977.vercel.app",
-  "http://localhost:5173", // optional for development
+  "https://tinylink-lyart.vercel.app", // Production frontend
+  "http://localhost:5173", // Development
 ];
 
 // Middleware
