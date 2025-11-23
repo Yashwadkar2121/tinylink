@@ -16,6 +16,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import CopyButton from "./CopyButton";
+import { linksAPI } from "../utils/api";
 
 const LinkTable = ({ links, loading, onDelete }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,17 +102,12 @@ const LinkTable = ({ links, loading, onDelete }) => {
   };
 
   const getShortUrl = (shortCode) => {
-    if (window.location.hostname === "localhost") {
-      return `http://localhost:5000/${shortCode}`;
-    }
-
-    return `https://tinylink-9nqm.vercel.app/${shortCode}`;
+    return linksAPI.getRedirectUrl(shortCode);
   };
 
   const handleShortLinkClick = (shortCode, event) => {
     event.preventDefault();
-    const shortUrl = getShortUrl(shortCode);
-    window.open(shortUrl, "_blank", "noopener,noreferrer");
+    linksAPI.handleRedirect(shortCode);
   };
 
   const isEmpty = !Array.isArray(links) || links.length === 0;
@@ -344,8 +340,7 @@ const LinkTable = ({ links, loading, onDelete }) => {
                     {/* Short Code Column */}
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <motion.a
-                          href={getShortUrl(link?.shortCode)}
+                        <motion.button
                           onClick={(e) =>
                             handleShortLinkClick(link?.shortCode, e)
                           }
@@ -353,15 +348,13 @@ const LinkTable = ({ links, loading, onDelete }) => {
                           title={`Click to test: ${getShortUrl(
                             link?.shortCode
                           )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
                           <Link2 className="w-4 h-4" />
                           {link?.shortCode || "N/A"}
                           <ExternalLink className="w-3 h-3 opacity-0 group-hover/link:opacity-100 transition-opacity duration-200" />
-                        </motion.a>
+                        </motion.button>
                         <CopyButton text={getShortUrl(link?.shortCode)} />
                       </div>
                     </td>

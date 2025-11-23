@@ -1,16 +1,26 @@
 import axios from "axios";
 
-// Use environment variable or default to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// Dynamic API URL detection
+const getApiBaseUrl = () => {
+  // For production (Vercel)
+  if (window.location.hostname === "tinylink-9nqm.vercel.app") {
+    return "https://tinylink-backend.onrender.com";
+  }
+  // For local development
+  return "http://localhost:5000";
+};
 
-console.log("API Base URL:", API_BASE_URL); // Debug log
+const API_BASE_URL = import.meta.env.VITE_API_URL || getApiBaseUrl();
+
+console.log("API Base URL:", API_BASE_URL);
+console.log("Current Hostname:", window.location.hostname);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000, // 10 second timeout
+  timeout: 10000,
 });
 
 // Request interceptor
@@ -81,18 +91,17 @@ export const linksAPI = {
     await api.delete(`/api/links/${code}`);
   },
 
-  // Hit redirect endpoint to trigger click count
-  trackClick: async (shortCode) => {
-    try {
-      // Use axios instance without /api prefix for redirects
-      const response = await axios.get(
-        `${API_BASE_URL.replace("/api", "")}/${shortCode}`
-      );
-      return response.data;
-    } catch (err) {
-      console.warn("Redirect tracking failed:", err.message);
-      throw err;
-    }
+  // Get the correct redirect URL based on environment
+  getRedirectUrl: (shortCode) => {
+    const baseUrl = getApiBaseUrl();
+    return `${baseUrl}/${shortCode}`;
+  },
+
+  // Handle redirect with click tracking
+  handleRedirect: (shortCode) => {
+    const redirectUrl = linksAPI.getRedirectUrl(shortCode);
+    console.log("Redirecting to:", redirectUrl);
+    window.open(redirectUrl, "_blank", "noopener,noreferrer");
   },
 
   // Health check
