@@ -24,8 +24,8 @@ A full-stack URL shortener application built with React.js frontend and Node.js 
 
 ## 🚀 Live Demo
 
-- **Frontend**: [https://tinylink.vercel.app](https://tinylink.vercel.app)
-- **Backend API**: [https://tinylink-backend.onrender.com](https://tinylink-backend.onrender.com)
+- **Frontend**: [https://tinylink.vercel.app](https://tinylink-lyart.vercel.app)
+- **Backend API**: [https://tinylink-backend.onrender.com](https://tinylink-3v85.onrender.com)
 
 ## 🛠️ Tech Stack
 
@@ -61,28 +61,28 @@ Before running locally, ensure you have:
 
 ### 1. Clone the Repository
 
+```
 git clone https://github.com/Yashwadkar2121/tinylink.git
 cd tinylink
-
 ```
 2. Backend Setup
+```
 cd backend
 
 # Install dependencies
 npm install
-
-# Environment variables
+```
+3. Environment variables
 ```
 Create a .env file with:
 DATABASE_URL=your_neon_postgresql_connection_string
-PORT=5000
-NODE_ENV=development
 
 # Start development
 server
 npm run dev
 ```
 3. Frontend Setup
+```
 cd frontend
 
 # Install dependencies
@@ -96,7 +96,8 @@ REACT_APP_API_URL=http://localhost:5000
 npm start
 ```
 
-🗄️ Database Schema
+##  🗄️ **Database Schema**
+```
 sql
 CREATE TABLE links (
     id SERIAL PRIMARY KEY,
@@ -105,41 +106,20 @@ CREATE TABLE links (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     click_count INTEGER DEFAULT 0
 );
-📡 API Endpoints
-Base URL: https://tinylink-backend.onrender.com
-Method	Endpoint	Description	Request Body
-POST	/api/shorten	Create short URL	{ "originalUrl": "string", "customCode": "string" (optional) }
-GET	/api/links	Get all links	-
-GET	/:shortCode	Redirect to original URL	-
-Example Usage
-Create Short URL:
+```
+##  🌐  **Deployment**
 
-bash
-curl -X POST https://tinylink-backend.onrender.com/api/shorten \
-  -H "Content-Type: application/json" \
-  -d '{"originalUrl": "https://example.com/very-long-url"}'
-Response:
-
-json
-{
-  "id": 1,
-  "originalUrl": "https://example.com/very-long-url",
-  "shortCode": "abc123",
-  "shortUrl": "https://tinylink-backend.onrender.com/abc123",
-  "createdAt": "2024-01-15T10:30:00.000Z"
-}
-🌐 Deployment
-Backend Deployment (Render)
+1. Backend Deployment (Render)
 Push code to GitHub
 
 Connect repository to Render
 
-Set environment variables in Render dashboard
+Set environment variables in the Render dashboard
 
 Deploy automatically on git push
 
-Frontend Deployment (Vercel)
-Connect GitHub repository to Vercel
+2. Frontend Deployment (Vercel)
+Connect the GitHub repository to Vercel
 
 Set environment variables:
 
@@ -147,25 +127,14 @@ REACT_APP_API_URL=https://tinylink-backend.onrender.com
 
 Deploy automatically on git push
 
-Database (Neon.tech)
-Create account on Neon.tech
+3. Database (Neon.tech)
+Create an account on Neon. tech
 
-Create new PostgreSQL project
+Create a new PostgreSQL project
 
 Get connection string
 
-Add to backend environment variables
-
-🔒 Environment Variables
-Backend (.env)
-env
-DATABASE_URL=postgresql://username:password@ep-cool-bird-123456.us-east-2.aws.neon.tech/dbname?sslmode=require
-PORT=5000
-NODE_ENV=production
-Frontend (.env)
-env
-REACT_APP_API_URL=https://tinylink-backend.onrender.com
-🎯 Usage
+##  🎯 **Usage**
 Visit the frontend: Go to https://tinylink.vercel.app
 
 Enter long URL: Paste your long URL in the input field
@@ -176,7 +145,7 @@ Generate short link: Click "Shorten URL" button
 
 Copy and share: Use the generated short link anywhere
 
-🤝 Contributing
+##  🤝 **Contributing**
 We welcome contributions! Please follow these steps:
 
 Fork the repository
@@ -189,17 +158,15 @@ Push to the branch (git push origin feature/amazing-feature)
 
 Open a Pull Request
 
-📝 License
-This project is licensed under the MIT License - see the LICENSE file for details.
 
-👨‍💻 Author
+##  👨‍💻 Author
 Yash Wadkar
 
 GitHub: @Yashwadkar2121
 
 Project: Tinylink
 
-🙏 Acknowledgments
+##  🙏 Acknowledgments
 React.js community
 
 Express.js team
@@ -212,7 +179,7 @@ Vercel for frontend hosting
 
 text
 
-This README.md includes:
+## This README.md includes:
 
 1. **Project overview** with features
 2. **Live demo links** (you'll need to update with your actual deployed URLs)
